@@ -181,4 +181,48 @@ Claude 3.5 Sonnet supports up to 8192 tokens with beta headers."
   :type 'integer
   :group 'efrit)
 
+;;; Rovodev CLI Configuration
+
+(defcustom efrit-use-rovodev nil
+  "Mode for Rovodev CLI integration.
+- nil: Use direct Anthropic API (default, backward compatible)
+- \\='oneshot: Use one-shot CLI commands (best for efrit-do)
+- \\='server: Use persistent HTTP server (best for efrit-chat/agent)
+- \\='hybrid: Auto-select based on interface (oneshot for do, server for chat/agent)"
+  :type '(choice (const :tag "Direct API (default)" nil)
+                 (const :tag "One-shot commands" oneshot)
+                 (const :tag "HTTP server" server)
+                 (const :tag "Hybrid (auto-select)" hybrid))
+  :group 'efrit)
+
+(defcustom efrit-rovodev-command "acli"
+  "Rovodev CLI command (typically \\='acli\\=').
+Can be absolute path if not in PATH."
+  :type 'string
+  :group 'efrit)
+
+(defcustom efrit-rovodev-oneshot-timeout 90
+  "Timeout for one-shot commands in seconds.
+Test results show complex tasks take up to 45 seconds.
+Default includes safety margin."
+  :type 'integer
+  :group 'efrit)
+
+(defcustom efrit-rovodev-message-timeout 120
+  "Timeout for server mode messages in seconds.
+Includes streaming and tool execution time."
+  :type 'integer
+  :group 'efrit)
+
+(defcustom efrit-rovodev-server-port 8123
+  "Default port for Rovodev HTTP server."
+  :type 'integer
+  :group 'efrit)
+
+(defcustom efrit-rovodev-server-startup-wait 5
+  "Seconds to wait after starting server for MCP servers to load.
+Server startup takes 3-5 seconds for MCP initialization."
+  :type 'integer
+  :group 'efrit)
+
 ;;; efrit-config.el ends here
