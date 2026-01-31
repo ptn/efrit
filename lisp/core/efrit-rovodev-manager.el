@@ -99,9 +99,12 @@ CRITICAL: Always uses --disable-session-token flag for API access."
   (interactive)
   (when efrit-rovodev--server-process
     (efrit-log 'info "Stopping Rovodev server on port %s" efrit-rovodev--server-port)
-    (delete-process efrit-rovodev--server-process)
-    (when (buffer-live-p (process-buffer efrit-rovodev--server-process))
-      (kill-buffer (process-buffer efrit-rovodev--server-process)))
+    (let ((buffer (and (processp efrit-rovodev--server-process)
+                       (process-buffer efrit-rovodev--server-process))))
+      (when (process-live-p efrit-rovodev--server-process)
+        (delete-process efrit-rovodev--server-process))
+      (when (and buffer (buffer-live-p buffer))
+        (kill-buffer buffer)))
     (setq efrit-rovodev--server-process nil
           efrit-rovodev--server-port nil
           efrit-rovodev--server-ready nil)

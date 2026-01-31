@@ -104,11 +104,18 @@ CRITICAL: Exit code is unreliable - parse stdout instead."
             (efrit-log 'error "One-shot detected error in output")
             (funcall callback nil (format "Rovodev error: %s" output)))
            
-           ;; Check for valid response marker
-           ((string-match "─── Response ───\\(.*\\)" output)
-            (let ((response-text (match-string 1 output)))
+           ;; Check for valid response marker and extract content
+           ;; Split on "─── Response" header and extract content until footer dashes
+           ((string-match "─── Response ─+\n" output)
+            (let* ((start (match-end 0))
+                   (remaining (substring output start))
+                   ;; Find the footer (line of dashes)
+                   (end (string-match "\n─+\n" remaining))
+                   (response-text (if end
+                                     (substring remaining 0 end)
+                                   remaining)))
               (efrit-log 'info "One-shot completed successfully in %.1fs" elapsed)
-              (funcall callback (efrit-rovodev-oneshot--parse-response response-text) nil)))
+              (funcall callback (efrit-rovodev-oneshot--parse-response (string-trim response-text)) nil)))
            
            ;; Unexpected output format
            (t

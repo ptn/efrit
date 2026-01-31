@@ -265,9 +265,11 @@ CRITICAL: Must accumulate part_delta events."
                 (pcase event-type
                   ('part_delta
                    ;; CRITICAL: Accumulate streaming text
-                   (when-let ((delta (alist-get 'content_delta parsed-data)))
-                     (setq accumulated-text (concat accumulated-text delta))
-                     (efrit-log 'debug "Delta: %s" (substring delta 0 (min 50 (length delta))))))
+                   ;; Data structure: {"delta": {"content_delta": "text", ...}, ...}
+                   (when-let* ((delta-obj (alist-get 'delta parsed-data))
+                              (content-delta (alist-get 'content_delta delta-obj)))
+                     (setq accumulated-text (concat accumulated-text content-delta))
+                     (efrit-log 'debug "Delta: %s" (substring content-delta 0 (min 50 (length content-delta))))))
                   
                   ('close
                    ;; Stream complete
